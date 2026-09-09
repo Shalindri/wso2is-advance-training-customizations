@@ -1,0 +1,60 @@
+# =====================================================================================
+# iam-training-7.3.0-v2 - what to add to deployment.toml
+#
+# Copy the blocks below into:
+#     <IS_HOME>/repository/conf/deployment.toml
+# then restart the server.
+#
+# MAKE A BACKUP OF deployment.toml FIRST:
+#     cp deployment.toml deployment.toml.backup
+#
+# Lab 02 needs nothing here. Deploying its jar is enough.
+# Lab 04 is a separate web service - you register it in the Console instead.
+# =====================================================================================
+
+
+# --- Lab 01: event handler ------------------------------------------------------------
+# "name" must be exactly what getName() returns in the Java class.
+# Get it wrong and nothing happens - no error, the handler is simply never called.
+[[event_handler]]
+name = "crdbTrainingCustomEventHandlerV2"
+subscriptions = ["POST_ADD_USER"]
+
+
+# --- Lab 03: post authentication handler ----------------------------------------------
+# "name" here is the full class name, unlike lab 01.
+#
+# HEADS UP: this handler runs on EVERY login, including the Console and My Account.
+# The v2 handler only writes a log line so it cannot lock you out, but remember the
+# off switch: set enable = false and restart.
+[[event_listener]]
+id = "crdb_training_custom_post_auth_v2"
+type = "org.wso2.carbon.identity.core.handler.AbstractIdentityHandler"
+name = "org.wso2.iam.training.v2.postauthn.CRDBTrainingCustomPostAuthHandlerV2"
+order = 899
+enable = true
+
+
+# --- Lab 05: custom user store ---------------------------------------------------------
+# Adds your class to the list of user store types the Console is allowed to offer.
+[user_store_mgt]
+custom_user_stores = ["org.wso2.iam.training.v2.userstore.CRDBTrainingCustomUserStoreManagerV2"]
+
+
+# --- Lab 07: custom grant type ---------------------------------------------------------
+# "mobile-v2" is the value apps will send as grant_type=mobile-v2
+[[oauth.custom_grant_type]]
+name = "mobile-v2"
+grant_handler = "org.wso2.iam.training.v2.grant.CRDBTrainingCustomMobileGrantV2"
+grant_validator = "org.wso2.iam.training.v2.grant.CRDBTrainingCustomMobileGrantV2Validator"
+
+[oauth.custom_grant_type.properties]
+IdTokenAllowed = true
+PublicClientAllowed = true
+
+
+# --- Lab 08: custom login step ---------------------------------------------------------
+# "name" must be exactly what getName() returns in the Java class.
+[authentication.authenticator.crdb_training_custom_authenticator_v2]
+name = "CRDBTrainingCustomAuthenticatorV2"
+enable = true

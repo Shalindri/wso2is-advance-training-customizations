@@ -1,0 +1,7 @@
+server:
+  # 8091 so this can run at the same time as the v1 service on 8090.
+  port: 8091
+
+logging:
+  level:
+    org.wso2.iam.training.v2.passwordaction: INFO
